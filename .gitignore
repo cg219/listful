@@ -106,3 +106,4 @@ dist
 #Custom
 dist/
 .cache/
+config/config.json
