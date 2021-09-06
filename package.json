@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel src/index.html"
+    "dev": "parcel src/index.html",
+    "dev:server": "nodemon server"
   },
   "repository": {
     "type": "git",
@@ -18,11 +19,16 @@
   },
   "homepage": "https://github.com/cg219/listful#readme",
   "dependencies": {
+    "axios": "^0.21.4",
     "batboy.mente": "^0.1.3",
     "courier.mente": "^1.0.13",
+    "fastify": "^3.20.2",
     "mithril": "^2.0.4"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.5"
-  }
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ]
 }
