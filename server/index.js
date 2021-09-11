@@ -1,22 +1,47 @@
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
+
 const fastify = require('fastify');
 const { vow } = require('batboy.mente');
 const axios = require('axios');
-const config = require('./../config/config.json');
+const jwt = require('jsonwebtoken');
 const PORT = process.env.PORT || 3000;
 const spotifySchema = {
     body: {
         code: { type: 'string' }
     }
 }
+const appleKeyPath = path.resolve(process.cwd(), path.join('private', 'appleKey.p8'));
+const appleKey = fs.readFileSync(appleKeyPath).toString();
+
+// post('http://localhost:3000/apple/token')
 
 function main() {
     var app = fastify();
 
     app.post('/spotify', spotifySchema, getSpotifyTokens);
     app.post('/spotify/refresh', spotifySchema, refreshSpotifyTokens);
+    app.post('/apple/token', sendAppleToken);
     app.options('*', preflightCheck);
 
     return app;
+}
+
+async function sendAppleToken(req, res) {
+    var token = jwt.sign({}, appleKey, {
+        algorithm: 'ES256',
+        expiresIn: '180d',
+        issuer: process.env.APPLE_TEAM_ID,
+        header: {
+            alg: 'ES256',
+            kid: process.env.APPLE_KEY_ID
+        }
+    });
+
+    res
+        .headers({ 'Access-Control-Allow-Origin': req.headers.origin, 'Content-Type': 'application/json' })
+        .send({ token })
 }
 
 async function getSpotifyTokens(req, res) {
@@ -26,10 +51,10 @@ async function getSpotifyTokens(req, res) {
         params: {
             grant_type: 'authorization_code',
             code: req.body.code,
-            redirect_uri: config.spotify.redirect_uri
+            redirect_uri: process.env.SPOTIFY_REDIRECT_URI
         },
         headers: {
-            'Authorization': `Basic ${Buffer.from(`${config.spotify.client_id}:${config.spotify.client_secret}`).toString('base64')}`,
+            'Authorization': `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }))
@@ -51,7 +76,7 @@ async function refreshSpotifyTokens(req, res) {
             refresh_token: req.body.code
         },
         headers: {
-            'Authorization': `Basic ${Buffer.from(`${config.spotify.client_id}:${config.spotify.client_secret}`).toString('base64')}`,
+            'Authorization': `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }))

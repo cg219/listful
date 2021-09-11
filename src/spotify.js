@@ -19,7 +19,7 @@ module.exports = {
         localStorage.setItem('spotify_accessToken', response.access_token);
         if (response.refresh_token) localStorage.setItem('spotify_refreshToken', response.refresh_token);
 
-        console.log(response);
+        window.location.href = '/';
     },
     view() { return m('div') }
 }

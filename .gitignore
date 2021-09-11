@@ -107,3 +107,4 @@ dist
 dist/
 .cache/
 config/config.json
+private/
