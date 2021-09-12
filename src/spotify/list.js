@@ -26,6 +26,16 @@ async function onItemClick(event) {
     console.log(`${name} Transferred`);
 }
 
+async function makeLikedList(event) {
+    console.log('Retreiving Liked Songs');
+    console.log('Please Wait ...');
+    await playlist.likes();
+    console.log('Creating Playlist');
+    var tracks = await playlist.likedData.reduce(getTracks, []);
+    await createPlaylist({ name: 'Spotify Likes', description: 'My Liked songs from Spotify', tracks });
+    console.log('Playlist Created');
+}
+
 async function getTracks(acc, { track: { external_ids: { isrc } } }) {
     acc = await acc;
 
@@ -54,6 +64,7 @@ module.exports = {
     view() {
         return m('div.List', [
             m('p', 'Spotify Playlists'),
+            m('button', { onclick: makeLikedList }, 'Make Playlist from Likes'),
             m('ul', playlist.data.map(makeList))
         ])
     }

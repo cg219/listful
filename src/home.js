@@ -8,7 +8,7 @@ function sendToSpotify(event) {
     SpotifyAuth.authorize({
         client: config.spotify.client_id,
         redirect: config.spotify.redirect_uri,
-        scope: 'playlist-read-private user-library-read'
+        scope: 'playlist-read-private playlist-read-collaborative user-library-read'
     })
 }
 

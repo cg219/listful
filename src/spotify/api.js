@@ -2,6 +2,29 @@ const m = require('mithril');
 const { vow } = require('batboy.mente');
 let accessToken;
 
+async function loadLikes({ token, next, data = [] } = {}) {
+    if (!token && !accessToken) throw new Error('Please pass or set token');
+    var [response, error] = await vow(m.request({
+        url: `${ next || 'https://api.spotify.com/v1/me/tracks' }`,
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${ token || accessToken }`,
+            'Content-Type': 'application/json'
+        }
+    }))
+
+    if (error) throw error;
+    if (response.next) {
+        return await loadLikes({
+            token: token || accessToken,
+            next: response.next,
+            data: [...data, ...response.items]
+        })
+    }
+
+    return [...data, ...response.items];
+}
+
 async function loadPlaylists({ token, next, data = [] } = {}) {
     if (!token && !accessToken) throw new Error('Please pass or set token');
     var [response, error] = await vow(m.request({
@@ -54,6 +77,7 @@ var API = {
     playlist: {
         data: [],
         trackData: [],
+        likedData: [],
         async playlists({ token } = {}) {
             API.playlist.data = await loadPlaylists({ token });
             return API.playlist.data;
@@ -61,6 +85,10 @@ var API = {
         async tracks({ token, url } = {}) {
             API.playlist.trackData = await loadTracks({ url });
             return API.playlist.trackData;
+        },
+        async likes({ token } = {}) {
+            API.playlist.likedData = await loadLikes({ token });
+            return API.playlist.likedData;
         }
     }
 }
