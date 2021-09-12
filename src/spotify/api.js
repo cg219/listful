@@ -53,14 +53,14 @@ var API = {
     setToken(token) { accessToken = token; },
     playlist: {
         data: [],
-        tracks: [],
+        trackData: [],
         async playlists({ token } = {}) {
             API.playlist.data = await loadPlaylists({ token });
             return API.playlist.data;
         },
         async tracks({ token, url } = {}) {
-            API.playlist.tracks = await loadTracks({ url });
-            return API.playlist.tracks;
+            API.playlist.trackData = await loadTracks({ url });
+            return API.playlist.trackData;
         }
     }
 }

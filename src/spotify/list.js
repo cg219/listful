@@ -5,7 +5,7 @@ function makeList({ id, name, tracks }) {
     return m('li', { 'data-tracklist': tracks.href, 'data-id': id, onclick: onItemClick }, name)
 }
 
-async function onItemClick(event, vnode) {
+async function onItemClick(event) {
     var data = await playlist.tracks({ url: event.target.attributes['data-tracklist'].value });
 
     console.log(data);
